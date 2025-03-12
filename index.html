@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jeu du Morpion</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        .tableau {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(3, 100px);
+            gap: 5px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .case {
+            width: 100px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            background-color: #f0f0f0;
+            border: 1px solid #000;
+            cursor: pointer;
+        }
+        .case:hover {
+            background-color: #ddd;
+        }
+        .message {
+            margin-top: 20px;
+            font-size: 1.5em;
+        }
+    </style>
+</head>
+<body>
+    <h1>Jeu du Morpion</h1>
+    <div class="tableau" id="tableau"></div>
+    <p class="message" id="message"></p>
+    <button onclick="reset()">Recommencer</button>
+    
+    <script>
+        const tableau = document.getElementById("tableau");
+        const message = document.getElementById("message");
+        let joueur = "X";
+        let statutPartie = ["", "", "", "", "", "", "", "", ""];
+        const combinaisonsGagnantes = [
+            [0, 1, 2], [3, 4, 5], [6, 7, 8],
+            [0, 3, 6], [1, 4, 7], [2, 5, 8],
+            [0, 4, 8], [2, 4, 6]
+        ];
+
+        function gagnant() {
+            for (const combination of combinaisonsGagnantes) {
+                const [a, b, c] = combination;
+                if (statutPartie[a] && statutPartie[a] === statutPartie[b] && statutPartie[a] === statutPartie[c]) {
+                    message.textContent = `Le joueur ${joueur} a gagné !`;
+                    tableau.style.pointerEvents = "none";
+                    return true;
+                }
+            }
+            if (!statutPartie.includes("")) {
+                message.textContent = "Match nul !";
+                return true;
+            }
+            return false;
+        }
+
+        function handleClick(index) {
+            if (statutPartie[index] || message.textContent !== "") return;
+            statutPartie[index] = joueur;
+            afficherTableau();
+            if (!gagnant()) {
+                joueur = joueur === "X" ? "O" : "X";
+            }
+        }
+
+        function afficherTableau() {
+            tableau.innerHTML = "";
+            statutPartie.forEach((value, index) => {
+                const cellule = document.createElement("div");
+                cellule.classList.add("case");
+                cellule.textContent = value;
+                cellule.addEventListener("click", () => handleClick(index));
+                tableau.appendChild(cellule);
+            });
+        }
+
+        function reset() {
+            statutPartie = ["", "", "", "", "", "", "", "", ""];
+            joueur = "X";
+            message.textContent = "";
+            tableau.style.pointerEvents = "auto";
+            afficherTableau();
+        }
+
+        afficherTableau();
+    </script>
+</body>
+</html>
